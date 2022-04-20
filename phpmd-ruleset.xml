@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Laravel and similar phpmd ruleset"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+  <description>
+    Inspired by https://github.com/phpmd/phpmd/issues/137
+    using http://phpmd.org/documentation/creating-a-ruleset.html
+  </description>
+  <!-- clean code rules -->
+  <!-- StaticAccess is excluded because Laravel has lots of facade with static method  -->
+  <rule ref="rulesets/cleancode.xml">
+    <exclude name="StaticAccess"/>
+  </rule>
+
+  <!-- code size rules -->
+  <rule ref="rulesets/codesize.xml/CyclomaticComplexity"/>
+  <rule ref="rulesets/codesize.xml/NPathComplexity"/>
+  <rule ref="rulesets/codesize.xml/ExcessiveMethodLength"/> <!-- max 100 lines by default -->
+  <rule ref="rulesets/codesize.xml/ExcessiveClassLength"/> <!-- max 1000 lines by default -->
+  <rule ref="rulesets/codesize.xml/ExcessiveParameterList"/> <!-- max 10 parameters/arguments by default-->
+  <rule ref="rulesets/codesize.xml/ExcessivePublicCount"/> <!-- max 45 public methods & properties per class -->
+  <rule ref="rulesets/codesize.xml/TooManyFields"/> <!-- max 15 properties/fields per class -->
+  <!-- set to max 30 methods for now, but it ignores methods start with "get" or "set" -->
+  <rule ref="rulesets/codesize.xml/TooManyMethods">
+      <properties>
+          <property name="maxmethods" value="30"/>
+      </properties>
+  </rule>
+  <!--
+      https://pdepend.org/documentation/software-metrics/weighted-method-count.html
+      The WMC metric is defined as the sum of complexities of all methods declared in a class.
+      This metric is a good indicator how much effort will be necessary to maintain and develop a particular class.
+      A lower WMC usually indicates to a class with better abstraction and polymorphism.
+      While a class with a high complexity value is a good indicator that it this class is
+      very application specific and does more than one job, and therefore harder to test, reuse and maintain.
+  -->
+  <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity"/>
+
+  <!-- controversial rules -->
+  <!--
+      basically disallow underscore for:
+      1. Class Name
+      2. Property Name
+      3. Method Name
+      4. Parameter Name
+      5. Variable Name
+      and force Camel Case for them
+  -->
+  <rule ref="rulesets/controversial.xml"/>
+
+  <!-- design rules -->
+  <!--
+      disallow usage of certain methods (exit, eval etc.)
+      disallow certain behaviours (e.g use count() method directly inside a loop expression)
+      enable all design rules except CouplingBetweenObjects
+      then enable it with different rule value
+  -->
+  <rule ref="rulesets/design.xml">
+      <exclude name="CouplingBetweenObjects"/>
+  </rule>
+  <rule ref="rulesets/design.xml/CouplingBetweenObjects">
+      <properties>
+          <property name="minimum" value="20"/>
+      </properties>
+  </rule>
+
+  <!-- naming rules -->
+  <rule ref="rulesets/naming.xml">
+      <exclude name="ShortVariable"/>
+  </rule>
+  <!-- define custom ShortVariable rule-->
+  <!--
+      the minumum length of a variable name should be 3 letters
+      but some common use of short variable names are exceptions
+      such as i, j inside a loop
+  -->
+  <rule ref="rulesets/naming.xml/ShortVariable"
+        since="0.2"
+        message="Avoid variables with short names like {0}. Configured minimum length is {1}."
+        class="PHPMD\Rule\Naming\ShortVariable"
+        externalInfoUrl="http://phpmd.org/rules/naming.html#shortvariable">
+      <priority>3</priority>
+      <properties>
+          <property name="minimum" description="Minimum length for a variable, property or parameter name" value="3"/>
+          <property name="exceptions" value="id,q,w,i,j,v,e,f,fp" />
+      </properties>
+  </rule>
+
+  <!-- unused code rules -->
+  <!-- rules that find unused code -->
+  <rule ref="rulesets/unusedcode.xml"/>
+</ruleset>
