@@ -16,3 +16,5 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::resource('/test001', CustomersController::class, ['only' => ['index', 'create']]);// /test001 跟 test001 路由都是一樣的
